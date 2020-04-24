@@ -1,0 +1,103 @@
+/* http://meyerweb.com/eric/tools/css/reset/  v2.0 | 20110126 License: none (public domain) */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; }
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; }
+
+body { line-height: 1; }
+
+ol, ul { list-style: none; }
+
+blockquote, q { quotes: none; }
+
+blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+
+body { font-family: "Open Sans", sans-serif; }
+
+nav { background-color: #15152e; width: 100%; position: fixed; }
+
+nav #logo { float: left; text-decoration: none; color: white; font-weight: bold; font-size: 33px; padding-top: 16px; display: block; }
+
+nav .mainNav { max-width: 1024px; width: 90%; margin-left: auto; margin-right: auto; overflow: hidden; }
+
+nav ul { float: right; }
+
+nav li { float: left; }
+
+nav li a { display: block; text-align: center; padding: 25px 16px; text-decoration: none; color: white; }
+
+nav li a:hover, nav .current { background-color: #272752; }
+
+h1, h2 { text-align: center; font-weight: bold; color: #15152e; }
+
+h1 { font-size: 3.5em; padding: 30px 0; }
+
+h2 { font-size: 2em; padding-bottom: 22.5px; margin-top: 22.5px; }
+
+h2::before { display: block; content: " "; margin-top: -81px; height: 81px; visibility: hidden; }
+
+h3 { font-size: 1.5em; padding-bottom: 15px; font-weight: bold; color: #15152e; }
+
+h6 { font-style: italic; text-align: center; padding: 15px 0; }
+
+.mainContent { padding: 66px 0; max-width: 1024px; width: 90%; margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; }
+
+a { color: #15158a; }
+
+a:hover { color: red; }
+
+b { font-weight: bold; }
+
+i { font-style: italic; }
+
+p { padding-bottom: 15px; line-height: 1.5em; }
+
+.ulStandard { line-height: 1.5em; list-style-type: disc; list-style-position: outside; padding-bottom: 15px; padding-left: 16px; }
+
+img.centered { display: block; margin: 0 auto; }
+
+.code { font-family: "Roboto Mono", monospace; color: #272752; }
+
+.ulHTB a { text-decoration: none; display: inline; text-align: center; width: 16%; padding: 30px 2%; height: 150px; float: left; font-size: 1.2em; }
+
+.ulHTB a img { max-height: 100%; max-width: 100%; padding-bottom: 0.25em; opacity: 0.8; }
+
+.ulHTB a:hover img { opacity: 1; font-weight: bold; }
+
+.htbCard { display: block; margin: 15px auto 30px auto; max-width: 470px; width: 100%; height: 100%; border-radius: 10px; }
+
+.htbToC, #htbToC-Float ul { max-width: 470px; width: 80%; border-style: solid; border-width: 2px; border-color: #15152e; border-radius: 10px; margin: 0 auto; }
+
+.htbToC a, #htbToC-Float ul a { text-decoration: none; font-weight: bold; font-size: 1.2em; display: inline-block; padding: 12.5px 0; width: 100%; text-align: center; }
+
+.htbToC a:hover, #htbToC-Float ul a:hover { background-color: #272752; color: white; }
+
+#htbToC-Float { width: 200px; position: fixed; left: 0; top: 50%; transform: translate(-110%, -50%); -webkit-transition: transform ease 0.6s; -moz-transition: transform ease 0.6s; -o-transition: transform ease 0.6s; transition: transform ease 0.6s; }
+
+#htbToC-Float ul { width: 100%; border-width: 2px 2px 2px 0; border-radius: 0 10px 10px 0; }
+
+#htbToC-Float span { font-size: 1.2em; padding-bottom: 2px; display: block; text-align: center; width: 100%; font-weight: bold; }
+
+#htbToC-Float .currentPos { background-color: #272752; color: white; }
+
+.htbTwoColumn { width: auto; border-collapse: separate; border-style: solid; border-width: 2px; border-color: #15152e; border-radius: 10px; overflow: hidden; line-height: 1.2em; margin: 0 auto 30px auto; }
+
+.htbTwoColumn th, .htbTwoColumn td { padding: 15px 7.5px; }
+
+.htbTwoColumn th { font-weight: bold; text-align: left; }
+
+.htbTwoColumn td:first-child { font-weight: bold; max-width: 20%; }
+
+.htbTwoColumn td:nth-child(2) { width: auto; }
+
+.htbTool { font-weight: bold; color: #272752; }
+
+.htbImage { width: 100%; margin: 15px 0 30px 0; }
+
+.htbImage img { display: block; margin: 0 auto 7.5px auto; max-width: 100%; border-style: solid; border-width: 2px; border-color: #15152e; border-radius: 10px; }
+
+.htbImage span { display: block; width: 100%; font-style: italic; text-align: center; }
+
+/*# sourceMappingURL=styles.css.map */

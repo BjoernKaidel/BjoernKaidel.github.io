@@ -1,0 +1,5 @@
+- Hints section for the boxes?
+
+- Use a better system to decide which menu item is selected
+
+- Is the Welcome page really necessary?

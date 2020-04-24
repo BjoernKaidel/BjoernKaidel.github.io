@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"file": "noFloatToC.css",
+	"sources": [
+		"noFloatToC.scss",
+		"_sass/noFloatToC.scss"
+	],
+	"sourcesContent": [
+		"@import \"noFloatToC\";\n",
+		"#htbToC-Float {\r\n  display: none;\r\n}\r\n"
+	],
+	"names": [],
+	"mappings": "ACAA,AAAA,aAAa,CAAC,EACZ,OAAO,EAAE,IAAI,GACd"
+}

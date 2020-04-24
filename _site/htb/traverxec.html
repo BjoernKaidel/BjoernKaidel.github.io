@@ -1,0 +1,277 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<title>Björn Kaidel - HTB - Traverxec</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="../assets/css/styles.css">
+<link type="text/css" rel="stylesheet" href="../assets/css/noFloatToC.css" media="screen and (max-width: 1459px)">
+<link type="text/css" rel="stylesheet" href="../assets/css/phone.css" media="screen and (max-width: 510px)">
+
+<script src="../assets/javascript/script.js"></script>
+
+<meta name="viewport" content="initial-scale=1">
+<meta name="description" content="Website of Björn Kaidel - Computer Scientist">
+<meta name="keywords" content="Björn Kaidel, Security, Cryptography, Computer Science">
+
+<!-- ****** faviconit.com favicons ****** -->
+<link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+<link rel="icon" sizes="16x16 32x32 64x64" href="../assets/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="196x196" href="../assets/favicon/favicon-192.png">
+<link rel="icon" type="image/png" sizes="160x160" href="../assets/favicon/favicon-160.png">
+<link rel="icon" type="image/png" sizes="96x96" href="../assets/favicon/favicon-96.png">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon/favicon-64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16.png">
+<link rel="apple-touch-icon" href="../assets/favicon/favicon-57.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../assets/favicon/favicon-114.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../assets/favicon/favicon-72.png">
+<link rel="apple-touch-icon" sizes="144x144" href="../assets/favicon/favicon-144.png">
+<link rel="apple-touch-icon" sizes="60x60" href="../assets/favicon/favicon-60.png">
+<link rel="apple-touch-icon" sizes="120x120" href="../assets/favicon/favicon-120.png">
+<link rel="apple-touch-icon" sizes="76x76" href="../assets/favicon/favicon-76.png">
+<link rel="apple-touch-icon" sizes="152x152" href="../assets/favicon/favicon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/favicon-180.png">
+<meta name="msapplication-TileColor" content="#FFFFFF">
+<meta name="msapplication-TileImage" content="../assets/favicon//favicon-144.png">
+<meta name="msapplication-config" content="../assets/favicon//browserconfig.xml">
+	<!-- ****** faviconit.com favicons ****** -->
+
+<!-- Metatags for Facebook -->
+<meta property="og:title" content="Björn Kaidel">
+<meta property="og:url" content="https://bjoernkaidel.github.io">
+<meta property="og:type" content="website">
+<meta property="og:description" content="Website of Björn Kaidel">
+<meta property="og:image" content="https:/bjoernkaidel.github.io/assets/favicon/favicon.png">
+
+  </head>
+
+  <body>
+    <nav>
+  <div class="mainNav">
+    <a href="/" id="logo">Björn Kaidel</a>
+    <ul>
+        
+          <li><a href="/" >Home</a></li>
+        
+          <li><a href="/about.html" >About</a></li>
+        
+          <li><a href="/tutorials.html" class="current">Tutorials</a></li>
+        
+    </ul>
+  </div>
+</nav>
+
+    <div class="mainContent">
+      <h1>HTB - Traverxec Write-Up</h1>
+
+<h2>Table of Contents</h2>
+
+<h6>Published on 23.04.2020</h6>
+
+<ul class="htbToC">
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#enum">Enumeration</a></li>
+  <li><a href="#foothold">Foothold</a></li>
+  <li><a href="#user">Exploitation - User</a></li>
+  <li><a href="#root">Exploitation - Root</a></li>
+</ul>
+
+
+
+<div id="htbToC-Float">
+  <span>HTB - Traverxec</span>
+  <ul>
+    <li><a href="#summary" id="summaryFloat">Summary</a></li>
+    <li><a href="#enum" id="enumFloat">Enumeration</a></li>
+    <li><a href="#foothold" id="footholdFloat">Foothold</a></li>
+    <li><a href="#user" id="userFloat">Exploitation - User</a></li>
+    <li><a href="#root" id="rootFloat">Exploitation - Root</a></li>
+  </ul>
+</div>
+
+<h2 id="summary">Summary</h2>
+
+<img class="htbCard" src="../assets/htb/Traverxec/card.png" alt="traverxec.html Card">
+
+<p>
+  Traverxec is a <a href="https://www.hackthebox.eu" target="blank" rel="noopener noreferrer">Hack The Box</a> machine and has the IP address 10.10.10.165. It was released on the 16. November 2019, uses a <span class="htbTool">Linux</span> OS and is categorized as an <i>easy</i> machine.
+</p>
+
+<p>
+  The attack vectors are quite straight-forward. However, the machine offers a nice opportunity to learn about the <span class="htbTool">nostromo</span> webserver technology and the final step to get root access is a bit on the strange side. You'll see when we get there :)
+</p>
+
+<h2 id="enum">Enumeration</h2>
+
+<p>The first thing to do is to enumerate and gather information about the box. One of the most important tools is the port scanner <span class="htbTool">nmap</span>. I like to run it with the parameters <span class="htbTool">-T4 -A -p-</span> to get a thorough scan:</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/nmap.png" alt="Traverxec nmap "> <span>nmap -T4 -A -p- 10.10.10.165</span> </div>
+
+<p>
+  There are only two ports open on Traverxec:
+</p>
+
+<table class="htbTwoColumn">
+  <tr>
+    <td>Port 22 - ssh:</td>
+    <td>ssh is rarely a direct way to attack HTB boxes, so I ignore that for now.</td>
+  </tr>
+  <tr>
+    <td>Port 80 – nostromo 1.9.6:</td>
+    <td>A nostromo webserver that seems to be running a website with the title <b>TRAVERXEC</b>.</td>
+  </tr>
+</table>
+
+<h3>Port 80 – nostromo 1.9.6 webserver:</h3>
+
+Let's check out the website in the browser by surfing to the ip address of the box:
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/website.jpg" alt="Traverxec Website "> <span>The website serverd by the nostromo server</span> </div>
+
+<p>
+  The usual next steps are checking the source code of the page and looking for directories and files using <span class="htbTool">dirbuster</span> (or a similar tool) on the webserver. However, I don’t find anything interesting in the source code and <span class="htbTool">dirbuster</span> has problems with the site (it constantly stops because of some exceptions). Judging from the website however, it seems likely that there’s a user called <i>david</i> (or something similar) on the box.
+</p>
+
+<p>
+  Since <span class="htbTool">dirbuster</span> wasn't very helpful, it would be a good idea to try some other fuzzing tools. But before I tried that, I checked if there are any known exploits available for <span class="htbTool">nostromo</span> using <span class="htbTool">searchsploit</span>… and there are:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/searchsploit.png" alt="Traverxec searchsploit"> <span>searchsploit results for nostromo</span> </div>
+
+<p>
+  Seems like there’s a <span class="htbTool">Metasploit</span> exploit available. For practice, I decide to look if there’s also a manual exploit available (note that the second exploit listed by searchsploit is for a different version of <span class="htbTool">nostromo</span>) and find <a href="https://www.exploit-db.com/exploits/47837" target="blank" rel="noopener noreferrer">this exploit</a> with a quick online search.
+</p>
+<p>
+  I decide to download this exploit and see if I can get it to work.
+</p>
+
+<h2 id="foothold">Foothold</h2>
+
+<p>
+  Let’s see if the exploit works for Traverxec! I decide to remove the "art" part and the "cve2019_16278.py" line of the exploit for to get it to run and so that its output takes up less space in the terminal. Using the exploit is pretty simple: Just provide the IP (10.10.10.165) and port (80) you want to attack and which command you want to execute. As an initial proof-of-concept, I simply try to execute <i>whoami</i> and it works:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/exploit_whoami.png" alt="Traverxec Nostromo Exploit whoami"> <span>Executing "whoami" on Traverxec using the exploit</span> </div>
+
+<p>
+  (By the way, the Metasploit exploit that <span class="htbTool">searchsploit</span> suggests also works without a problem, so it’s also possible to go that way if you prefer!)
+</p>
+
+<p>
+  Next, I start up a <span class="htbTool">netcat</span> listener on my Kali VM on port 1234 and use the exploit to start a reverse shell using <span class="htbTool">netcat</span> as well. This works like a charm and I upgrade it to a TTY shell using the well-known Python commands <span class="code">python -c 'import pty; pty.spawn("/bin/sh");'</span>.
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/exploit_revshell.png" alt="Traverxec Exploit Reverse Shell"></div>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/exploit_revshell_connect.png" alt="Traverxec Exploit Reverse Shell Connection"> <span>Reverse shell using netcat</span> </div>
+
+<h2 id="user">Exploitation - User</h2>
+
+<p>
+  Navigating to <i>/home</i> reveals that there is indeed a user <i>david</i> on the box, however, we have no read permission on his home directory. So, to get the <i>user.txt</i>, we first need to find a way to escalate our privileges.
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/david_noread.png" alt="Traverxec ls -la in home directory"> <span>Contents of /home</span> </div>
+
+<p>
+  Before I try to do anything complicated, I decide to see if I can find the <span class="htbTool">nostromo</span> files on the box and find them in <i>/var/nostromo</i>
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/nostromo_dir.png" alt="Traverxec /var/nostromoa"><span>Contents of /var/nostromo</span></div>
+
+<p>
+  The directory <i>conf</i> sounds especially interesting, so I take a closer look. It contains two files <i>.htpasswd</i> and <i>nhttpd.conf</i> which sound promising:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/nostromo_conf.png" alt="Traverxec /var/nostromo/conf"> <span>Contents of /var/nostromo/conf</span> </div>
+
+<p>
+  The file <i>.htpasswd</i> contains a hash for <i>david</i>, so it’s safe to assume that this might be a password hash. <span class="htbTool">hashid</span> tells me that it’s an MD5 hash:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/nostromo_htpasswd.png" alt="Traverxec nostromo htpasswd file"> <span></span> </div>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/hashid.png" alt="Traverxec hashid of the hash found in the .htpasswd file"> <span></span> </div>
+
+<p>
+  I use <span class="htbTool">johntheripper</span> and the well-known <i>rockyou.txt</i> wordlist to crack the hash, which reveals the password <i>Nowonly4me</i>.
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/john_david_pwd.png" alt="Traverxec Cracking the hash found in .htpasswd"> <span>Cracking the hash found in .htpasswd</span> </div>
+
+<p>
+  The question is: where can the password be used? Logging in as <i>david</i> through <span class="htbTool">ssh</span> using this password fails and there’s no obvious <span class="htbTool">nostromo</span> login page to use the password. Maybe <i>nhttpd.conf</i> contains a clue:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/nostromo_nhttpdconf.png" alt="Traverxec nhttp.conf file"> <span>Contents of the nhttp.conf file</span> </div>
+
+<p>
+  We can see that <i>david</i> is the <span class="htbTool">nostromo</span> admin and the file mentions optional home directories. To better understand this file, taking a look <a href="https://gsp.com/cgi-bin/man.cgi?topic=NHTTPD" target="blank" rel="noopener noreferrer"><span class="htbTool">nostromo</span> manual</a> is helpful.
+</p>
+
+<p>
+  The manual reveals that if the <i>homedirs</i> parameters are set, then they can be accessed through the URL <i>/~username/</i>, so in this case <i>/~david/</i>. Checking this URL out reveals this page:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/david_page.jpg" alt="Traverxec Page of david"> <span>http://10.10.10.165/~david/</span> </div>
+
+<p>
+  Unfortunately, this page doesn’t contain much usable info. So how to continue? I decide to investigate where this page is stored on the box. The <i>nhttpd.conf</i> file and the <span class="htbTool">nostromo</span> manual tell me that the files are stored in the <i>/home/[username]/public_www</i> directory of the respective <span class="htbTool">nostromo</span> user. Hmm… maybe it is possible to read the <i>/home/david/public_www</i> directory, even though we have no read permission on <i>/home/david/</i> itself? This guess turns out to be true:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/david_publicwww.png" alt="Traverxec Contents of the /home/david/public_www/ directory"> <span>/home/david/public_www/</span> </div>
+
+<p>
+  The directory <i>protected-file-area</i> sounds promising and in there I find a file called <i>backup-ssh-identity-files.tgz</i>. I transfer the file to my machine and investigate it. There are several ways to transfer files from a <span class="htbTool">netcat</span> reverse shell, but for convenience, I check out the <i>protected-file-area</i> folder in my browser. I’m greeted by a login prompt where I can use the <i>Nowonly4me</i> password and download the file through the browser.
+</p>
+
+<p>
+  Extracting the tgz archive reveals a backup of <i>david's</i> <span class="htbTool">ssh</span> public and private key <i>id_rsa</i> and <i>id_rsa.pub</i>. Great! However, if I try to login using the private key, I need to enter a password. <i>Nowonly4me</i> does not work, so we first need to crack it. I use the <span class="htbTool">ssh2john</span> tool (on Kali, this can be found in <i>/usr/share/john/ssh2john.py</i>) to get a file that <span class="htbTool">johntheripper</span> can crack and then let it do the heavy lifting using <i>rockyou.txt:</i>
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/david_ssh_crack.png" alt="Traverxec Cracking david's ssh key"> <span>Cracking david's ssh key</span> </div>
+
+<p>
+  <span class="htbTool">john</span> determines the password to be <i>hunter</i>. Trying to login as <i>david</i> through <span class="htbTool">ssh</span> using this password succeeds and we can read the <i>user.txt</i> file:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/david_ssh_login.png" alt="Traverxec Successful login as david through ssh"> <span>Successful login as david through ssh</span> </div>
+
+<h2 id="root">Exploitation - Root</h2>
+
+<p>
+  To root the box, I first check out the home directory of <i>david</i> that we previously had no access to. In there we find an interesting <i>/bin</i> directory that contains a script called <i>server-status.sh</i>. We can execute the script without any problems. Taking a look at its code reveals that <i>sudo journalctl -n5 unostromo.service</i> is being called, so it seems like <i>david</i> has sudo access to this specific command. However, if we try to verify this with <i>sudo -l</i>, we are prompted for a password and again, none of the passwords we found so far works.
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/server-stats-details.png" alt="Traverxec The home directory of david and the server-status.sh script"> <span>Details of david's home directory and server-stats.sh</span> </div>
+
+<p>
+  However, we can also simply check this assumption by running the command ourselves outside of the script, which also succeeds:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/sudo_journalctl.png" alt="Traverxec sudo journalctl"> <span>Trying sudo journalctl -n5 unostromo.service</span> </div>
+
+<p>
+  Unfortunately, if I try to modify this command in any way, I'm prompted for the sudo password again. So it seems like <i>david</i> can only execute this specific command in this exact configuration with sudo permissions.
+</p>
+
+<p>
+  How to continue from here? <a href="https://gtfobins.github.io/gtfobins/journalctl/" target="blank" rel="noopener noreferrer">GTFOBins</a> has a page on <span class="htbTool">journalctl</span> which tells me that <span class="htbTool">journalctl</span> usually pages its output to <span class="htbTool">less</span> – and from there it’s possible to get a root shell (since we’re executing it with sudo permissions). But if I execute the command, I simply get returned to the <span class="htbTool">ssh</span> prompt.
+</p>
+
+<p>
+  By pure accident (and because of some hints in the HTB forums), I discover that <span class="htbTool">journalctl</span> switches to <span class="htbTool">less</span> if my terminal width is smaller than the output of the command:
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/journalctl_less.png" alt="Traverxec journalctl paging to less"> <span>journalctl paging its output to less</span> </div>
+
+<p>
+  According to <a href="https://gtfobins.github.io/gtfobins/journalctl/" target="blank" rel="noopener noreferrer">GTFOBins</a> it's possible to spawn an interactive shell by executing <i>!/bin/sh</i> within this prompt. This works and since we executed <span class="htbTool">journalctl</span> with sudo permissions, I now have root access to the box and can read the <i>root.txt</i> file. Success!
+</p>
+
+<div class="htbImage"> <img src="../assets/htb/Traverxec/journalctl_root.png" alt="Traverxec Root access through journalctl"> <span>Success!</span> </div>
+
+    </div>
+  </body>
+</html>

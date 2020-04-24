@@ -1,0 +1,29 @@
+nav {
+
+  #logo {
+    display: none;
+  }
+
+  ul {
+    width: 100%;
+  }
+
+  li {
+    width: 33%;
+  }
+
+  li a {
+    padding: 12px 0;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    width: 100%;
+  }
+}
+
+.ulHTB {
+  a {
+    width: 31%;
+  }
+}

@@ -1,0 +1,24 @@
+---
+layout: default
+title: Tutorials
+base: ""
+---
+<h1>Tutorials & Articles</h1>
+
+<p>
+  At the moment I mostly use this section to publish my <a href="https://www.hackthebox.eu" target="blank" rel="noopener noreferrer">Hack The Box</a> writeups.
+</p>
+
+<h2>Hack The Box Write-Ups</h2>
+
+<p>
+  <a href="https://www.hackthebox.eu" target="blank" rel="noopener noreferrer">Hack The Box</a> is an online platform focused on cyber security. It provides challenges in various fields of security to its members, like hacking virtual machines or <i>"boxes"</i> that were crafted for this purpose, cryptographic challenges and so on. Each challenge is retired after some time and users are encouraged to share how they solved retired challenges in <i>"write-ups"</i>. Below you find a list of my write-ups.
+</p>
+
+<ul class="ulHTB">
+  {% for item in site.data.htb %}
+    <li>
+      <a href="{{item.link}}"><img src="{{item.image}}" alt="{{item.name}} Icon"><br>{{item.name}}</a>
+    </li>
+  {% endfor %}
+</ul>

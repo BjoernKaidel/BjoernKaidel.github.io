@@ -1,0 +1,10 @@
+<nav>
+  <div class="mainNav">
+    <a href="/" id="logo">Björn Kaidel</a>
+    <ul>
+        {% for item in site.data.navigation %}
+          <li><a href="{{site.base}}{{item.link }}" {% if page.url == item.link or page.menu == item.link %}class="current"{% endif %}>{{ item.name }}</a></li>
+        {% endfor %}
+    </ul>
+  </div>
+</nav>

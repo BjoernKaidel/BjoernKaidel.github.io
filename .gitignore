@@ -1,7 +1,0 @@
-# ignore the offline site
-/_site
-/.jekyll-cache
-
-/htb/wall.html
-/assets/htb/wall
-/assets/htb/wall.png

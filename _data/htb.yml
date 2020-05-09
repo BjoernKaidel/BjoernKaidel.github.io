@@ -6,6 +6,10 @@
   image: /assets/htb/mango.png
   link: /htb/mango.html
 
+- name: "ServMon"
+  image: /assets/htb/servmon.png
+  link: /htb/servmon.html
+
 - name: "Traverxec"
   image: /assets/htb/traverxec.png
   link: /htb/traverxec.html

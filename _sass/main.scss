@@ -161,6 +161,14 @@ p {
   padding-left: $sidePadding;
 }
 
+ol {
+  line-height: $lineHeight;
+  list-style-type: decimal;
+  list-style-position: outside;
+  padding-bottom: $paragraphBottomPad;
+  padding-left: $sidePadding;
+}
+
 img.centered {
     display: block;
     margin: 0 auto;

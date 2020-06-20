@@ -8,12 +8,221 @@ box: ServMon
 
 <h1>HTB - {{page.box}} Write-Up</h1>
 
+<h2>Table of Contents</h2>
+
+<h6>Published on 19.06.2020</h6>
+
+<ul class="htbToC">
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#enum">Enumeration</a></li>
+  <li><a href="#foothold">Foothold</a></li>
+  <li><a href="#user">Exploitation - User</a></li>
+  <li><a href="#root">Exploitation - Root</a></li>
+</ul>
+
+
+
+<div id="htbToC-Float">
+  <span>{{page.title}}</span>
+  <ul>
+    <li><a href="#summary" id="summaryFloat">Summary</a></li>
+    <li><a href="#enum" id="enumFloat">Enumeration</a></li>
+    <li><a href="#foothold" id="footholdFloat">Foothold</a></li>
+    <li><a href="#user" id="userFloat">Exploitation - User</a></li>
+    <li><a href="#root" id="rootFloat">Exploitation - Root</a></li>
+  </ul>
+</div>
+
+<h2 id="summary">Summary</h2>
+
 <img class="htbCard" src="{{page.base}}assets/htb/{{page.box}}/card.png" alt="{{page.box}} Card">
 
 <p>
-  ServMon is a <a href="https://www.hackthebox.eu" target="blank" rel="noopener noreferrer">Hack The Box</a> machine and has the IP address 10.10.10.184. It was released on the 11. April 2020, uses a <span class="htbTool">Windows</span> OS and is categorized as an <i>easy</i> machine.
+  ServMon is a <a href="https://www.hackthebox.eu" target="blank" rel="noopener noreferrer">Hack The Box</a> machine and has the IP address 10.10.10.184. It was released on 11. April 2020, uses a <span class="htbTool">Windows</span> OS and is categorized as an <i>easy</i> machine.
 </p>
 
 <p>
-  ServMon is a <b>still active machine</b>. The rules of <a href="https://www.hackthebox.eu" target="blank" rel="noopener noreferrer">Hack The Box</a> prohibit the publication of write-ups before the boxes are retired. My write-up will appear here once the box has been retired.
+  This box features two different web apps that you need to exploit using publicly available exploits. The attacks themselves are not very difficult, however one of the apps is a bit unstable on the box... but there's a way around that, as we'll see later :)
 </p>
+
+<h2 id="enum">Enumeration</h2>
+
+<p>The first thing to do is to enumerate and gather information about the box. One of the most important tools is the port scanner <span class="htbTool">nmap</span>. I like to run it with the parameters <span class="htbTool">-T4 -A -p-</span> to get a thorough scan. However, there are so many ports open on ServMon that it is hard to capture all of them on a single screenshot, which is why I also ran another scan using <span class="htbTool">-T4 -p-</span> as the sole parameters to get a nicer overview for this writeup.</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nmap_full.png" alt="{{page.box}} nmap -T4 -A -p- "> <span>nmap -T4 -A -p- 10.10.10.184</span> </div>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nmap_portsonly.png" alt="{{page.box}} nmap -T4 -p-"> <span>nmap -T4 -p- 10.10.10.184</span> </div>
+
+<p>
+  Since there are a lot of ports open, it seems like a good idea to prioritize a smaller selection before checking out all ports (from experience with other HTB boxes, I can say that is a quite common "tactic" of box creators to hide the intersting ports in a sea of open ports that lead nowhere - this doesn't apply to real-life scenarios, of course). I decide to focus on these ports first:
+</p>
+
+<table class="htbTwoColumn">
+  <tr>
+    <td>Port 21 - ftp:</td>
+    <td>The box allows anonymous ftp login. This means we can login as the user <i>anonymous</i> without providing a password.</td>
+  </tr>
+  <tr>
+    <td>Port 22 - ssh:</td>
+    <td>Direct attacks on <span class="htbTool">ssh</span> usually are not the way to solve HTB challenges, but it's still good to keep in mind that it is available on the box.</td>
+  </tr>
+  <tr>
+    <td>Port 80 – http:</td>
+    <td>Looks like a webserver serving a site without a title.</td>
+  </tr>
+  <tr>
+    <td>Port 8443 - ssl/https-alt:</td>
+    <td>Another website, this time served over https and with the title <i>NSCLient++</i>.</td>
+  </tr>
+</table>
+
+<h3>Port 21 – ftp:</h3>
+
+<p>
+  Logging in as <i>anonymous</i> reveals that there's a directory <i>Users</i> with subdirectories <i>Nadine</i> and <i>Nathan</i> that we can read... and both contain interesting sounding .txt files:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/ftp_anon.png" alt="{{page.box}} ftp "> <span>Anonymous access to ftp</span> </div>
+
+<p>
+ Let's check out these file! I download them both through <span class="htbTool">ftp</span> (using the <i>get</i> command) and take a look at them.
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/confidential.png" alt="{{page.box}} - Concents of Confidential.txt"> <span>Contents of Confidential.txt</span> </div>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/notes.png" alt="{{page.box}} - Contents of Notes to do.txt"> <span>Contents of Notes to do.txt</span> </div>
+
+<p>
+  So it seems like <i>Nadine</i> left a <i>Pasword.txt</i> on the desktop of <i>Nathan</i>, who hasn't completed his to-dos yet. Maybe we can get some passwords that way? Let's keep that in mind for later.
+</p>
+
+<h3>Port 80 - http:</h3>
+
+<p>
+  Surfing to 10.10.10.184 in a browser reveals a <span class="htbTool">NVMS-1000</span> login page:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/port80.jpg" alt="{{page.box}} - NVMS-1000 login page on port 80"> <span>NVMS-1000 login page on port 80</span> </div>
+
+<p>
+  <span class="htbTool">NVMS</span> seems to be a <a href="http://en.tvt.net.cn/products/188.html" target="blank" rel="noopener noreferrer">network surveillange management software</a>, i.e. a tool that can be used to control video cameras over a network etc.
+</p>
+
+<p>
+ Since this seems like a very intentional and specific software choice by the box creator, I directly check out whether there's an exploit available using <span class="htbTool">searchsploit</span> (and skip fuzzing the server for directories etc. using  <i>dirbuster</i> or similar tools, which would be a natural step at this point). This reveals that there is a directory traversal exploit available:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/searchsploit_nvms.png" alt="{{page.box}} - searchsploit NVMS"> <span>searchsploit nvms</span> </div>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nvms_exploit.png" alt="{{page.box}} - Details about the NVMS exploit"> <span>Details about the NVMS exploit</span> </div>
+
+<p>
+ The exploit tells me that issuing a GET request like this <i>GET /../../../../../../../../../../../../windows/win.ini HTTP/1.1</i> can be used to read files on the server. I start <span class="htbTool">Burp Suite</span> and try to verify this with the proof-of-concept command from the exploit. After issuing the request, I successfully receive the contents of the <i>win.ini</i> file of the server.
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/burp_poc.png" alt="{{page.box}} - Checking the PoC with Burp Suite"> <span>Checking the PoC with Burp Suite</span> </div>
+
+<p>
+  Remembering the info we gathered in the <span class="htbTool">ftp</span> server, I check if the <i>Passwords.txt</i> file is still on Nathan's desktop and if I can read it using this exploit... and it works!
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/burp_passwords.png" alt="{{page.box}} - Reading Passwords.txt on Nathan's desktop using the exploit"> <span>Reading Passwords.txt on Nathan's desktop using the exploit</span> </div>
+
+<p>
+  Now we have some passwords! The question is... where can we use them and for which user? The text of <i>Confidential.txt</i> ("place it back into the secure folder") reads a bit like the users on the machine might use this file as a general password backup for all users... hm... let's continue this in the <a href="#foothold">Foothold section</a>.
+</p>
+
+<h3>Port 8443 - https:</h3>
+
+<p>
+ Before trying to use the passwords, I quickly check out the https port, which (after ignoring the certificate warning) reveals a <span class="htbTool">NSClient++</span> dashboard (which doesn't always load properly). <span class="htbTool">NSClient++</span> is a tool that can be used to control various monitoring tools. I keep that in mind... maybe it will come in handy later.
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/port8443.jpg" alt="{{page.box}} - NSClient++ on port 8443"> <span>NSClient++ on port 8443</span> </div>
+
+<h2 id="foothold">Foothold</h2>
+
+<p>
+  The next step is to see if we can use the passwords that we found through the <span class="htbTool">NVMS-1000</span> directory traversal exploit somewhere. Since <span class="htbTool">ssh</span> is available, I try that first. The <span class="htbTool">ftp</span> server told us that there are two users <i>Nadine</i> and  <i>Nathan</i> on the box. I set up  <i>hydra</i> to check whether one of the passwords works for one of these usernames by creating a <i>user.txt</i> containing the usernames and a <i>pw.txt</i> containing the passwords. This reveals that one of the passwords should work for <i>nadine:</i>
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nadinesshpw.png" alt="{{page.box}} - Checking ssh login with hydra"> <span>Checking ssh login with hydra</span> </div>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nadinelogin.png" alt="{{page.box}} - Logged in as nadine through ssh"> <span>Logged in as nadine through ssh</span> </div>
+
+<h2 id="user">Exploitation - User</h2>
+
+<p>
+  Not much left to do... :) The <i>user.txt</i> on Windows boxes can usually be found on the desktop of one of the users and on this box, it's on Nadine's desktop:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/usertxt.png" alt="{{page.box}} - user.txt on Nadine's desktop"> <span>user.txt on Nadine's desktop</span> </div>
+
+<h2 id="root">Exploitation - Root</h2>
+
+<p>
+  Remember the <span class="htbTool">NSClient++</span> login page we found during enumeration? A quick Google search tells me that there's an <a href="https://www.exploit-db.com/exploits/46802" target="blank" rel="noopener noreferrer">exploit availabe</a> for it. The exploits says that the files of <span class="htbTool">NSCLient++</span> should reside in <i>C:\Program Files\NSClient++</i>, so I check out this directory first and also verify that the "right" version of <span class="htbTool">NSClient++</span>, namely 0.5.2.35, is installed, which it is:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nscversion.png" alt="{{page.box}} - Verifying the version of NSClient++"> <span>Verifying the version of NSClient++</span> </div>
+
+<p>
+  The next step is to checkout the <i>nsclient.ini</i> file, which contains the password to log in to <span class="htbTool">NSClient++</span>. It also tells us that logins are only allowed from the local host:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nsclientini.png" alt="{{page.box}} - nsclient.ini"> <span>nsclient.ini</span> </div>
+
+<p>
+ Trying to login with the password fails, so the configuration seems to work. Unfortunately, we have no write permission on the directory (as a quick <i>echo "test" > test.txt</i> test implies), so there's no easy way to simple modify the "allowed hosts" line. Instead, I forward port 8443 using <span class="htbTool">ssh</span> with the command <i>ssh -L 8443:127.0.0.1:8443 nadine@10.10.10.184</i>. This way I'm able to access this port and therefore the <span class="htbTool">NSClient++</span> tool as if I'm working on the local machine by surfing to <i>https://127.0.0.1:8443</i>... which in turn allows me to login with the password!
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/nsclient_loggedin.png" alt="{{page.box}} - Logged into NSClient++"> <span>Logged into NSClient++</span> </div>
+
+<p>
+ Now it's time to follow the steps of the exploit description! It is written quite well, but the web interface of <span class="htbTool">NSClient++</span> is not really intuitive and its documentation is also not very well written. On top of that, it is quite laggy on this box (tip: I had better results using the web interface with Chromium then with Firefox, for whatever reason). That being said, let's root the box!
+</p>
+
+<p>
+ Thankfully, the necessary modules are already enabled. I prepare a payload file that I call <i>exploit.bat</i> like explained in the exploit description:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/exploitbat.png" alt="{{page.box}} - exploit.bat"> <span>exploit.bat</span> </div>
+
+<p>
+  Next, i start a netcat listener on my machine on port 1234 (<span class="code">nc -nvlp 1234</span>) and a server using <span class="htbTool">Python</span> (<span class="code">python -m SimpleHTTPServer 80</span>) on my Kali VM. I then transfer <i>nc.exe</i> (can be found in <i>/usr/share/windows-binaries</i> in Kali) and my <i>exploit.bat</i> onto the machine in the <i>C:/Temp</i> directory using <span class="htbTool">curl</span>:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/curl.png" alt="{{page.box}} - Downloading exploit.bat and nc.exe with curl"> <span>Downloading exploit.bat and nc.exe with curl</span> </div>
+
+<p>
+  To verify that the exploit script and <i>nc.exe</i> works, you can simply call them yourself on the <span class="htbTool">ssh</span> command line. I'd recommend you to do that, because you want to be sure that they are working before attempting the next steps.
+</p>
+
+<p>
+  The next steps in the exploit description use the web interface. You need to add a malicious script, add a schedule for it and restart the whole <span class="htbTool">NSClient++</span> tool. However, while I was able to root the box this way after some time, I found this way to be quite messy and also wasn't able to reliably repeat it.
+</p>
+<p>
+  Thankfully, there's also a <a href="https://docs.nsclient.org/api/legacy/" target="blank" rel="noopener noreferrer">REST API</a> available. The documentation is unfortunately not very good, so it isn't directly obvious how to translate the steps from the exploit description to the API. But I figured it out and it is a lot easier then using the web interface.
+</p>
+
+<p>
+  If you want to use the web interface instead, just keep in mind that you <i>do not need to restart the box!</i> The exploit tells us that a restart is necessary, but restarting boxes is never a good idea - and it suffices to restart the tool (there's an option under <i>Control</i>).
+</p>
+
+<p>
+  So, let's use the API: First, we add a script using the command <span class="code">curl -s -k -u admin -X PUT https://localhost:8443/api/v1/scripts/ext/scripts/exploit.bat --data-binary @exploit.bat</span>, as described <a href="https://docs.nsclient.org/api/scripts/#add-script" target="blank" rel="noopener noreferrer">here</a>. We need to do this from our <span class="htbTool">ssh</span> prompt while inside the directory where we uploaded the .bat file. Note that here <i>"exploit"</i> is just the name I'm giving the script, you can use whatever name you want for it. The command then prompts us to enter the <span class="htbTool">NSClient++</span> password and after entering the correct one, the script is successfully added.
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/addexploit_api.png" alt="{{page.box}} - Adding our exploit script to NSClient++"> <span>Adding our exploit script to NSClient++</span> </div>
+
+<p>
+ Next, the exploit description tells us to add a schedule that executes the script. We can skip this step and simply execute the script directly. Unfortunately, the API documentation doesn't explain how scripts can be executed, but it turns out that they are executed just like <a href="https://docs.nsclient.org/api/rest/queries/" target="blank" rel="noopener noreferrer">queries</a>, i.e. it's possible to run our exploit script using the command <span class="code">curl - s -k -u admin -X Get https://localhost:8443/api/v1/queries/exploit/commands/execute</span>:
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/execute_api.png" alt="{{page.box}} - Executing the exploit script"> <span>Executing the exploit script</span> </div>
+
+<p>
+  After entering the admin password once again, our netcat listener we succesfully receives a connection and we now have root permissions on the box!
+</p>
+
+<div class="htbImage"> <img src="{{page.base}}assets/htb/{{page.box}}/root.png" alt="{{page.box}} - Success!"> <span>Success!</span> </div>
